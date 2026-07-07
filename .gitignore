@@ -1,0 +1,38 @@
+# System Files
+.DS_Store
+Thumbs.db
+*~
+*.swp
+
+# Frontend (Node / Vite)
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/*.local
+frontend/.env.*.local
+
+# Engine Build Artifacts (CMake)
+engine/build/
+engine/build-wasm/
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+*.dir/
+
+# Generated WASM / JS assets
+frontend/public/engine.js
+frontend/public/engine.wasm
+
+# Editor directories and files
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
