@@ -36,3 +36,5 @@ frontend/public/engine.wasm
 *.njsproj
 *.sln
 *.sw?
+
+docs/context/
