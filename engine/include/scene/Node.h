@@ -7,6 +7,8 @@
 #include <memory>
 #include <string>
 
+#include "math/aabb.h"
+
 namespace scene {
 
     class Node {
@@ -22,10 +24,12 @@ namespace scene {
 
         math::mat4 localTransform;
         math::mat4 worldTransform;
+        math::aabb boundingBox;
 
         Node(const std::string& name = "Node") 
             : name(name), position(0, 0, 0), rotation(math::quat::identity()), scale(1, 1, 1), 
-              localTransform(math::mat4::identity()), worldTransform(math::mat4::identity()) {}
+              localTransform(math::mat4::identity()), worldTransform(math::mat4::identity()),
+              boundingBox(math::vec3(-0.5f, -0.5f, -0.5f), math::vec3(0.5f, 0.5f, 0.5f)) {}
 
         Node* addChild(std::unique_ptr<Node> child) {
             child->parent = this;

@@ -23,22 +23,58 @@ async function initEngine() {
   const moduleInstance = await window.Module();
 
   // Call our embind functions
-  moduleInstance.init_renderer();
-  
   const canvas = document.getElementById('gpuCanvas') as HTMLCanvasElement;
+  if (!canvas) return;
+  
+  const dpr = window.devicePixelRatio || 1;
+  const width = Math.floor(window.innerWidth * dpr);
+  const height = Math.floor(window.innerHeight * dpr);
+  
+  canvas.width = width;
+  canvas.height = height;
+  moduleInstance.init_renderer(width, height);
+  
+  window.addEventListener('resize', () => {
+    const w = Math.floor(window.innerWidth * dpr);
+    const h = Math.floor(window.innerHeight * dpr);
+    canvas.width = w;
+    canvas.height = h;
+    moduleInstance.resize_renderer(w, h);
+  });
   if (canvas) {
     let isDragging = false;
     let lastX = 0;
     let lastY = 0;
 
+    let lastDownX = 0;
+    let lastDownY = 0;
+    let selectedAxis = -1;
+
     canvas.addEventListener('mousedown', (e) => {
       isDragging = true;
       lastX = e.clientX;
       lastY = e.clientY;
+      lastDownX = e.clientX;
+      lastDownY = e.clientY;
+
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      selectedAxis = moduleInstance.select_axis_at(x, y, rect.width, rect.height);
     });
 
-    window.addEventListener('mouseup', () => {
+    window.addEventListener('mouseup', (e) => {
       isDragging = false;
+      selectedAxis = -1;
+    });
+
+    canvas.addEventListener('click', (e) => {
+      if (Math.abs(e.clientX - lastDownX) < 5 && Math.abs(e.clientY - lastDownY) < 5 && selectedAxis === -1) {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        moduleInstance.select_object_at(x, y, rect.width, rect.height);
+      }
     });
 
     window.addEventListener('mousemove', (e) => {
@@ -48,11 +84,15 @@ async function initEngine() {
       lastX = e.clientX;
       lastY = e.clientY;
 
-      // Middle click or Shift+Click for panning
-      if (e.buttons === 4 || (e.buttons === 1 && e.shiftKey)) {
-          moduleInstance.pan_camera(dx * 0.01, dy * 0.01);
-      } else if (e.buttons === 1) {
-          moduleInstance.orbit_camera(dx * 0.01, dy * 0.01);
+      if (selectedAxis !== -1) {
+          moduleInstance.drag_selected(dx, dy, selectedAxis);
+      } else {
+          // Middle click or Shift+Click for panning
+          if (e.buttons === 4 || (e.buttons === 1 && e.shiftKey)) {
+              moduleInstance.pan_camera(dx * 0.01, dy * 0.01);
+          } else if (e.buttons === 1) {
+              moduleInstance.orbit_camera(dx * 0.01, dy * 0.01);
+          }
       }
     });
 

@@ -3,13 +3,15 @@ project(TesseraeEngine)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include_directories(include)
 
 if (EMSCRIPTEN)
-    add_executable(engine src/main.cpp)
+    file(GLOB_RECURSE ENGINE_SOURCES src/*.cpp)
+    add_executable(engine ${ENGINE_SOURCES})
     target_compile_options(engine PRIVATE --use-port=emdawnwebgpu)
-    target_link_options(engine PRIVATE --use-port=emdawnwebgpu --bind "-sWASM=1" "-sMODULARIZE=1" "-sEXPORT_NAME=Module")
+    target_link_options(engine PRIVATE --use-port=emdawnwebgpu --bind "-sWASM=1" "-sMODULARIZE=1" "-sEXPORT_NAME=Module" "--embed-file=${CMAKE_CURRENT_SOURCE_DIR}/shaders@/shaders")
     set_target_properties(engine PROPERTIES SUFFIX ".js")
     
     # Output to the frontend/public directory

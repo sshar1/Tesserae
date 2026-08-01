@@ -1,0 +1,20 @@
+CompileFlags:
+  Compiler: /Users/sami/Code/emsdk/upstream/bin/clang++
+  Add:
+    - "--target=wasm32-unknown-emscripten"
+    - "--sysroot=/Users/sami/Code/emsdk/upstream/emscripten/cache/sysroot"
+    - "-std=c++20"
+    - "-I/Users/sami/Code/Tesserae/engine/include"
+    - "-isystem/Users/sami/Code/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1"
+    - "-isystem/Users/sami/Code/emsdk/upstream/lib/clang/23/include"
+    - "-isystem/Users/sami/Code/emsdk/upstream/emscripten/cache/sysroot/include"
+    - "-isystem/Users/sami/Code/emsdk/upstream/emscripten/cache/sysroot/include/compat"
+    - "-I/Users/sami/Code/emsdk/upstream/emscripten/cache/ports/emdawnwebgpu/emdawnwebgpu_pkg/webgpu_cpp/include"
+    - "-I/Users/sami/Code/emsdk/upstream/emscripten/cache/ports/emdawnwebgpu/emdawnwebgpu_pkg/webgpu/include"
+    - "-DEMSCRIPTEN=1"
+  Remove:
+    - "--use-port=*"
+    - "--use-port=emdawnwebgpu"
+
+
+

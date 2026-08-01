@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Mesh.h"
+#include "math/vec3.h"
 #include <cmath>
 
 namespace geometry {
