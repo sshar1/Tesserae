@@ -12,10 +12,12 @@ renderer::Renderer rendererInstance;
 scene::Node* selectedNode = nullptr;
 
 void init_renderer(int width, int height) {
+    camera.aspect = (float)width / (float)height;
     rendererInstance.init(sceneGraph, camera, width, height);
 }
 
 void resize_renderer(int width, int height) {
+    camera.aspect = (float)width / (float)height;
     rendererInstance.resize(width, height);
 }
 
