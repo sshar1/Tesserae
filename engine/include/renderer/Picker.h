@@ -8,7 +8,7 @@ namespace renderer {
     class Picker {
     public:
         static bool select_object_at(scene::Scene& scene, scene::Camera& camera, scene::Node*& selectedNode, float x, float y, float width, float height);
-        static int select_axis_at(scene::Camera& camera, scene::Node* selectedNode, float x, float y, float width, float height);
-        static void drag_selected(scene::Camera& camera, scene::Node* selectedNode, float dx, float dy, int axis);
+        static int select_axis_at(scene::Camera& camera, scene::Node* selectedNode, float x, float y, float width, float height, int gizmoMode);
+        static void drag_selected(scene::Camera& camera, scene::Node* selectedNode, float dx, float dy, int axis, int gizmoMode);
     };
 }

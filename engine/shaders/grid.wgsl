@@ -57,18 +57,21 @@ fn fs_main(in : VertexOutput) -> FragmentOutput {
     let grid = abs(fract(coord - 0.5) - 0.5) / derivative;
     let line = min(grid.x, grid.y);
     
-    let minimumz = min(derivative.y, 1.0);
-    let minimumx = min(derivative.x, 1.0);
-    
     var color = vec4<f32>(0.2, 0.2, 0.2, 1.0 - min(line, 1.0));
-    
-    // Z axis (blue)
-    if(fragPos3D.x > -0.1 * minimumx && fragPos3D.x < 0.1 * minimumx) {
-        color = vec4<f32>(0.2, 0.2, 1.0, 1.0);
+
+    let zDist = abs(fragPos3D.x);
+    let zThickness = 1.0 * derivative.x;
+    let zAxis = 1.0 - smoothstep(0.0, zThickness, zDist);
+
+    let xDist = abs(fragPos3D.z);
+    let xThickness = 1.0 * derivative.y;
+    let xAxis = 1.0 - smoothstep(0.0, xThickness, xDist);
+
+    if (zAxis > 0.0) {
+        color = mix(color, vec4<f32>(0.2, 0.2, 1.0, 1.0), zAxis);
     }
-    // X axis (red)
-    if(fragPos3D.z > -0.1 * minimumz && fragPos3D.z < 0.1 * minimumz) {
-        color = vec4<f32>(1.0, 0.2, 0.2, 1.0);
+    if (xAxis > 0.0) {
+        color = mix(color, vec4<f32>(1.0, 0.2, 0.2, 1.0), xAxis);
     }
 
     // Fading at a distance

@@ -116,5 +116,57 @@ namespace geometry {
 
             return mesh;
         }
+
+        static Mesh createTorus(float mainRadius = 1.0f, float tubeRadius = 0.05f, int mainSegments = 32, int tubeSegments = 8) {
+            Mesh mesh;
+            
+            for (int i = 0; i <= mainSegments; ++i) {
+                float u = (float)i / mainSegments;
+                float theta = u * 3.14159265359f * 2.0f;
+                
+                float cosTheta = std::cos(theta);
+                float sinTheta = std::sin(theta);
+                
+                for (int j = 0; j <= tubeSegments; ++j) {
+                    float v = (float)j / tubeSegments;
+                    float phi = v * 3.14159265359f * 2.0f;
+                    
+                    float cosPhi = std::cos(phi);
+                    float sinPhi = std::sin(phi);
+                    
+                    float x = (mainRadius + tubeRadius * cosPhi) * cosTheta;
+                    float y = tubeRadius * sinPhi;
+                    float z = (mainRadius + tubeRadius * cosPhi) * sinTheta;
+                    
+                    math::vec3 position(x, y, z);
+                    
+                    float nx = cosPhi * cosTheta;
+                    float ny = sinPhi;
+                    float nz = cosPhi * sinTheta;
+                    
+                    math::vec3 normal(nx, ny, nz);
+                    mesh.vertices.push_back({position, normal, u, v});
+                }
+            }
+            
+            for (int i = 0; i < mainSegments; ++i) {
+                for (int j = 0; j < tubeSegments; ++j) {
+                    uint32_t p0 = (i * (tubeSegments + 1)) + j;
+                    uint32_t p1 = p0 + 1;
+                    uint32_t p2 = p0 + (tubeSegments + 1);
+                    uint32_t p3 = p2 + 1;
+                    
+                    mesh.indices.push_back(p0);
+                    mesh.indices.push_back(p2);
+                    mesh.indices.push_back(p1);
+                    
+                    mesh.indices.push_back(p1);
+                    mesh.indices.push_back(p2);
+                    mesh.indices.push_back(p3);
+                }
+            }
+            
+            return mesh;
+        }
     };
 }

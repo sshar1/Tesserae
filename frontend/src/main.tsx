@@ -41,6 +41,13 @@ async function initEngine() {
     canvas.height = h;
     moduleInstance.resize_renderer(w, h);
   });
+  
+  window.addEventListener('keydown', (e) => {
+    if (e.key === '1') moduleInstance.set_gizmo_mode(1);
+    if (e.key === '2') moduleInstance.set_gizmo_mode(2);
+    if (e.key === '3') moduleInstance.set_gizmo_mode(3);
+  });
+  
   if (canvas) {
     let isDragging = false;
     let lastX = 0;

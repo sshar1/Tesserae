@@ -29,7 +29,7 @@ namespace renderer {
 
         void init(scene::Scene& sceneGraph, scene::Camera& camera, int width, int height);
         void resize(int width, int height);
-        void render_frame(scene::Scene& sceneGraph, scene::Camera& camera, scene::Node* selectedNode);
+        void render_frame(scene::Scene& sceneGraph, scene::Camera& camera, scene::Node* selectedNode, int gizmoMode);
 
     private:
         wgpu::Buffer createBuffer(const void* data, size_t size, wgpu::BufferUsage usage);
@@ -43,6 +43,7 @@ namespace renderer {
         wgpu::Queue queue;
         
         wgpu::RenderPipeline pipeline;
+        wgpu::RenderPipeline gizmoPipeline;
         wgpu::RenderPipeline gridPipeline;
         
         wgpu::Surface surface;
@@ -50,9 +51,16 @@ namespace renderer {
         wgpu::TextureFormat depthFormat = wgpu::TextureFormat::Depth24Plus;
         wgpu::SurfaceConfiguration config{};
 
-        wgpu::Buffer vertexBuffer;
-        wgpu::Buffer indexBuffer;
-        uint32_t indexCount = 0;
+        struct MeshBuffers {
+            wgpu::Buffer vertexBuffer;
+            wgpu::Buffer indexBuffer;
+            uint32_t indexCount = 0;
+        };
+
+        MeshBuffers cubeBuffers;
+        MeshBuffers sphereBuffers;
+        MeshBuffers planeBuffers;
+        MeshBuffers torusBuffers;
 
         wgpu::Buffer uniformBuffers[MAX_DRAW_CALLS];
         wgpu::BindGroup bindGroups[MAX_DRAW_CALLS];

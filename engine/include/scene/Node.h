@@ -11,9 +11,12 @@
 
 namespace scene {
 
+    enum class MeshType { None, Cube, Sphere, Plane, Torus };
+
     class Node {
     public:
         std::string name;
+        MeshType meshType = MeshType::None;
         
         math::vec3 position;
         math::quat rotation;

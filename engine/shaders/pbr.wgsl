@@ -34,6 +34,12 @@ fn vs_main(in : VertexInput) -> VertexOutput {
 
 @fragment
 fn fs_main(in : VertexOutput) -> @location(0) vec4<f32> {
+    let isGizmo = u.cameraPos.w;
+    if (isGizmo > 0.5) {
+        // Unlit shading for gizmos
+        return vec4<f32>(pow(u.albedoMetallic.rgb, vec3<f32>(1.0 / 2.2)), 1.0);
+    }
+
     let N = normalize(in.normal);
     let L = normalize(u.lightDirRoughness.xyz);
     let V = normalize(u.cameraPos.xyz - in.worldPos);
