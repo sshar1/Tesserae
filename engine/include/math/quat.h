@@ -37,6 +37,44 @@ namespace math {
             return identity();
         }
 
+        // Convert quaternion to euler angles (XYZ order) in degrees
+        vec3 toEulerDegrees() const {
+            // Roll (X)
+            float sinr_cosp = 2.0f * (w * x + y * z);
+            float cosr_cosp = 1.0f - 2.0f * (x * x + y * y);
+            float roll = atan2f(sinr_cosp, cosr_cosp);
+            
+            // Pitch (Y)
+            float sinp = 2.0f * (w * y - z * x);
+            float pitch;
+            if (fabsf(sinp) >= 1.0f)
+                pitch = copysignf(3.14159265358979f / 2.0f, sinp);
+            else
+                pitch = asinf(sinp);
+            
+            // Yaw (Z)
+            float siny_cosp = 2.0f * (w * z + x * y);
+            float cosy_cosp = 1.0f - 2.0f * (y * y + z * z);
+            float yaw = atan2f(siny_cosp, cosy_cosp);
+            
+            float r2d = 180.0f / 3.14159265358979f;
+            return vec3(roll * r2d, pitch * r2d, yaw * r2d);
+        }
+
+        // Create quaternion from euler angles (XYZ order) in degrees
+        static quat fromEulerDegrees(float xDeg, float yDeg, float zDeg) {
+            float d2r = 3.14159265358979f / 180.0f;
+            float cx = cosf(xDeg * d2r * 0.5f), sx = sinf(xDeg * d2r * 0.5f);
+            float cy = cosf(yDeg * d2r * 0.5f), sy = sinf(yDeg * d2r * 0.5f);
+            float cz = cosf(zDeg * d2r * 0.5f), sz = sinf(zDeg * d2r * 0.5f);
+            return quat(
+                cx*cy*cz + sx*sy*sz,
+                sx*cy*cz - cx*sy*sz,
+                cx*sy*cz + sx*cy*sz,
+                cx*cy*sz - sx*sy*cz
+            );
+        }
+
         mat4 toMat4() const {
             mat4 res = mat4::identity();
             float xx = x * x, yy = y * y, zz = z * z;

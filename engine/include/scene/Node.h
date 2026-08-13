@@ -15,6 +15,8 @@ namespace scene {
 
     class Node {
     public:
+        static inline int nextId_ = 1;
+        int id;
         std::string name;
         MeshType meshType = MeshType::None;
         
@@ -30,7 +32,7 @@ namespace scene {
         math::aabb boundingBox;
 
         Node(const std::string& name = "Node") 
-            : name(name), position(0, 0, 0), rotation(math::quat::identity()), scale(1, 1, 1), 
+            : id(nextId_++), name(name), position(0, 0, 0), rotation(math::quat::identity()), scale(1, 1, 1), 
               localTransform(math::mat4::identity()), worldTransform(math::mat4::identity()),
               boundingBox(math::vec3(-0.5f, -0.5f, -0.5f), math::vec3(0.5f, 0.5f, 0.5f)) {}
 
