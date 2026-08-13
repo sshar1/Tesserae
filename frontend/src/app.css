@@ -23,18 +23,34 @@
   gap: 8px;
 }
 
+.editor-sidebar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 300px;
+  background: var(--panel-bg);
+  backdrop-filter: blur(24px) saturate(1.2);
+  -webkit-backdrop-filter: blur(24px) saturate(1.2);
+  border-left: 1px solid var(--border);
+  box-shadow: -4px 0 16px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+
+.editor-sidebar-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 200px;
+}
+
 .editor-outliner {
-  top: 12px;
-  left: 12px;
-  bottom: 12px;
-  width: 240px;
+  border-bottom: 1px solid var(--border);
 }
 
 .editor-inspector {
-  top: 12px;
-  right: 12px;
-  bottom: 12px;
-  width: 270px;
 }
 
 .panel-header {

@@ -219,8 +219,10 @@ export function App() {
       {ready && (
         <>
           <Toolbar gizmoMode={gizmoMode} onModeChange={handleSetGizmoMode} onAddPrimitive={handleAddPrimitive} />
-          <Outliner nodes={hierarchy} selectedId={selectedId} onSelect={handleSelectNode} onDelete={handleDeleteNode} />
-          <Inspector selectedId={selectedId} transform={transform} hierarchy={hierarchy} onTransformChange={handleTransformChange} />
+          <div className="editor-sidebar">
+            <Outliner nodes={hierarchy} selectedId={selectedId} onSelect={handleSelectNode} onDelete={handleDeleteNode} />
+            <Inspector selectedId={selectedId} transform={transform} hierarchy={hierarchy} onTransformChange={handleTransformChange} />
+          </div>
         </>
       )}
     </>

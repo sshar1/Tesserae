@@ -1,4 +1,4 @@
-import { Transform, SceneNode } from '../app'
+import type { Transform, SceneNode } from '../app'
 
 interface InspectorProps {
   selectedId: number
@@ -22,7 +22,7 @@ export function Inspector({ selectedId, transform, hierarchy, onTransformChange 
   
   if (selectedId < 0 || !transform) {
     return (
-      <div className="editor-panel editor-inspector">
+      <div className="editor-sidebar-panel editor-inspector">
         <div className="panel-header">Inspector</div>
         <div className="empty-state">
           Select an object to inspect its properties
@@ -62,7 +62,7 @@ export function Inspector({ selectedId, transform, hierarchy, onTransformChange 
   }
 
   return (
-    <div className="editor-panel editor-inspector">
+    <div className="editor-sidebar-panel editor-inspector">
       <div className="panel-header">Inspector</div>
       <div className="panel-content">
         <div className="inspector-node-name">

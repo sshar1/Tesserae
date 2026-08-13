@@ -1,4 +1,4 @@
-import { SceneNode } from '../app'
+import type { SceneNode } from '../app'
 
 interface OutlinerProps {
   nodes: SceneNode[]
@@ -43,10 +43,9 @@ export function Outliner({ nodes, selectedId, onSelect, onDelete }: OutlinerProp
   }
   
   return (
-    <div className="editor-panel editor-outliner">
+    <div className="editor-sidebar-panel editor-outliner">
       <div className="panel-header">
         <span>Scene</span>
-        <span style={{ color: 'var(--text-muted)' }}>{nodes.length}</span>
       </div>
       <div className="panel-content">
         {nodes.map(node => renderNode(node, 0))}
