@@ -110,15 +110,21 @@
 .node-row {
   display: flex;
   align-items: center;
-  height: 28px;
+  height: 22px;
   padding: 0 8px;
-  border-radius: 4px;
   cursor: pointer;
-  transition: background 150ms ease;
   color: var(--text-secondary);
   border-left: 2px solid transparent;
   gap: 8px;
-  font-size: 11px;
+  font-size: 13px;
+}
+
+.node-row.even {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.node-row.odd {
+  background: transparent;
 }
 
 .node-row:hover {
@@ -129,14 +135,6 @@
   background: var(--accent-subtle);
   border-left-color: var(--accent);
   color: var(--text-primary);
-}
-
-.node-icon {
-  font-size: 10px;
-  width: 14px;
-  display: flex;
-  justify-content: center;
-  color: var(--text-muted);
 }
 
 .node-name {

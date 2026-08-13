@@ -7,48 +7,44 @@ interface OutlinerProps {
   onDelete: (id: number) => void
 }
 
-function getNodeIcon(type: string) {
-  switch (type.toLowerCase()) {
-    case 'cube': return '□';
-    case 'sphere': return '○';
-    case 'plane': return '▬';
-    case 'torus': return '◎';
-    default: return '◇';
-  }
-}
-
 export function Outliner({ nodes, selectedId, onSelect, onDelete }: OutlinerProps) {
   
-  const renderNode = (node: SceneNode, depth: number) => {
-    return (
-      <div key={node.id}>
-        <div 
-          className={`node-row ${node.id === selectedId ? 'selected' : ''}`}
-          style={{ paddingLeft: `${8 + depth * 12}px` }}
-          onClick={() => onSelect(node.id)}
-        >
-          <div className="node-icon">{getNodeIcon(node.type)}</div>
-          <div className="node-name">{node.name}</div>
-          <button 
-            className="node-delete" 
-            onClick={(e) => { e.stopPropagation(); onDelete(node.id); }}
-            title="Delete node"
-          >
-            ×
-          </button>
-        </div>
-        {node.children && node.children.map(child => renderNode(child, depth + 1))}
-      </div>
-    )
-  }
+  const flatList: { node: SceneNode, depth: number }[] = [];
+  const flatten = (nList: SceneNode[], depth: number) => {
+    nList.forEach(n => {
+      flatList.push({ node: n, depth });
+      if (n.children) flatten(n.children, depth + 1);
+    });
+  };
+  flatten(nodes, 0);
   
   return (
     <div className="editor-sidebar-panel editor-outliner">
       <div className="panel-header">
         <span>Scene</span>
       </div>
-      <div className="panel-content">
-        {nodes.map(node => renderNode(node, 0))}
+      <div className="panel-content" style={{ padding: 0, gap: 0 }}>
+        {flatList.map((item, index) => {
+          const { node, depth } = item;
+          const isEven = index % 2 === 0;
+          return (
+            <div 
+              key={node.id}
+              className={`node-row ${node.id === selectedId ? 'selected' : ''} ${isEven ? 'even' : 'odd'}`}
+              style={{ paddingLeft: `${8 + depth * 12}px` }}
+              onClick={() => onSelect(node.id)}
+            >
+              <div className="node-name">{node.name}</div>
+              <button 
+                className="node-delete" 
+                onClick={(e) => { e.stopPropagation(); onDelete(node.id); }}
+                title="Delete node"
+              >
+                ×
+              </button>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
