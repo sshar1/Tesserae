@@ -390,11 +390,14 @@ namespace renderer {
                 uData.cameraPos = camera.position;
                 uData.padding1 = 1.0f; // isGizmo flag
                 
-                math::mat4 mTranslate = math::mat4::translation(selectedNode->position);
+                math::vec3 worldPos(selectedNode->worldTransform.m[12], 
+                                    selectedNode->worldTransform.m[13], 
+                                    selectedNode->worldTransform.m[14]);
+                math::mat4 mTranslate = math::mat4::translation(worldPos);
                 math::vec3 color;
                 
                 // Keep gizmo size constant relative to screen
-                float dist = (camera.position - selectedNode->position).length();
+                float dist = (camera.position - worldPos).length();
                 float scale = dist * 0.15f; 
                 
                 if (gizmoMode == 1) { // Translate (Arrows using Cube)

@@ -25,24 +25,14 @@ void init_renderer(int width, int height) {
     
     auto cube = std::make_unique<scene::Node>("Cube");
     cube->meshType = scene::MeshType::Cube;
-    cube->position = math::vec3(-1.5f, 0.5f, 0);
+    cube->position = math::vec3(0, 0, 0);
     
     auto sphere = std::make_unique<scene::Node>("Sphere");
     sphere->meshType = scene::MeshType::Sphere;
     sphere->position = math::vec3(1.5f, 0.5f, 0);
     
-    auto plane = std::make_unique<scene::Node>("Plane");
-    plane->meshType = scene::MeshType::Plane;
-    plane->position = math::vec3(0, 0.5f, -2.0f);
-    
-    auto torus = std::make_unique<scene::Node>("Torus");
-    torus->meshType = scene::MeshType::Torus;
-    torus->position = math::vec3(0, 0.5f, 2.0f);
-    
+    cube->addChild(std::move(sphere));
     root->addChild(std::move(cube));
-    root->addChild(std::move(sphere));
-    root->addChild(std::move(plane));
-    root->addChild(std::move(torus));
     
     sceneGraph.root = std::move(root);
 

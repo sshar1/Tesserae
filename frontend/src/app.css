@@ -137,6 +137,23 @@
   color: var(--text-primary);
 }
 
+.node-toggle {
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--text-muted);
+  cursor: pointer;
+  margin-right: 4px;
+  transition: color 150ms ease;
+}
+
+.node-toggle:hover {
+  color: var(--text-primary);
+}
+
 .node-name {
   flex: 1;
   white-space: nowrap;

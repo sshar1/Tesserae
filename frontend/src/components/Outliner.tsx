@@ -1,3 +1,4 @@
+import { useState } from 'preact/hooks'
 import type { SceneNode } from '../app'
 
 interface OutlinerProps {
@@ -8,12 +9,23 @@ interface OutlinerProps {
 }
 
 export function Outliner({ nodes, selectedId, onSelect, onDelete }: OutlinerProps) {
+  const [collapsedIds, setCollapsedIds] = useState<Set<number>>(new Set());
+
+  const toggleCollapse = (id: number, e: Event) => {
+    e.stopPropagation();
+    const next = new Set(collapsedIds);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setCollapsedIds(next);
+  };
   
   const flatList: { node: SceneNode, depth: number }[] = [];
   const flatten = (nList: SceneNode[], depth: number) => {
     nList.forEach(n => {
       flatList.push({ node: n, depth });
-      if (n.children) flatten(n.children, depth + 1);
+      if (n.children && n.children.length > 0 && !collapsedIds.has(n.id)) {
+        flatten(n.children, depth + 1);
+      }
     });
   };
   flatten(nodes, 0);
@@ -27,13 +39,22 @@ export function Outliner({ nodes, selectedId, onSelect, onDelete }: OutlinerProp
         {flatList.map((item, index) => {
           const { node, depth } = item;
           const isEven = index % 2 === 0;
+          const hasChildren = node.children && node.children.length > 0;
+          const isCollapsed = collapsedIds.has(node.id);
           return (
             <div 
               key={node.id}
               className={`node-row ${node.id === selectedId ? 'selected' : ''} ${isEven ? 'even' : 'odd'}`}
-              style={{ paddingLeft: `${8 + depth * 12}px` }}
+              style={{ paddingLeft: `${16 + depth * 14}px` }}
               onClick={() => onSelect(node.id)}
             >
+              <div 
+                className="node-toggle" 
+                style={{ visibility: hasChildren ? 'visible' : 'hidden' }}
+                onClick={(e) => toggleCollapse(node.id, e)}
+              >
+                {isCollapsed ? '▸' : '▾'}
+              </div>
               <div className="node-name">{node.name}</div>
               <button 
                 className="node-delete" 
