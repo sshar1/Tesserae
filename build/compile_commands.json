@@ -1,8 +1,0 @@
-[
-{
-  "directory": "/Users/sami/Code/Tesserae/build",
-  "command": "/usr/bin/clang++  -I/Users/sami/Code/Tesserae/engine/include -g -std=gnu++20 -arch arm64 -o CMakeFiles/test_math.dir/tests/test_math.cpp.o -c /Users/sami/Code/Tesserae/engine/tests/test_math.cpp",
-  "file": "/Users/sami/Code/Tesserae/engine/tests/test_math.cpp",
-  "output": "CMakeFiles/test_math.dir/tests/test_math.cpp.o"
-}
-]

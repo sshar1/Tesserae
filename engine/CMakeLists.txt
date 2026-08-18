@@ -10,8 +10,8 @@ include_directories(include)
 if (EMSCRIPTEN)
     file(GLOB_RECURSE ENGINE_SOURCES src/*.cpp)
     add_executable(engine ${ENGINE_SOURCES})
-    target_compile_options(engine PRIVATE --use-port=emdawnwebgpu)
-    target_link_options(engine PRIVATE --use-port=emdawnwebgpu --bind "-sWASM=1" "-sMODULARIZE=1" "-sEXPORT_NAME=Module" "--embed-file=${CMAKE_CURRENT_SOURCE_DIR}/shaders@/shaders")
+    target_compile_options(engine PRIVATE --use-port=emdawnwebgpu -g)
+    target_link_options(engine PRIVATE --use-port=emdawnwebgpu --bind "-sWASM=1" "-sMODULARIZE=1" "-sEXPORT_NAME=Module" "--embed-file=${CMAKE_CURRENT_SOURCE_DIR}/shaders@/shaders" -g -gseparate-dwarf)
     set_target_properties(engine PROPERTIES SUFFIX ".js")
     
     # Output to the frontend/public directory

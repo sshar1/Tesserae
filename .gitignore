@@ -4,6 +4,16 @@ Thumbs.db
 *~
 *.swp
 
+# Editor / IDE
+.vscode/
+.idea/
+.clangd
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
 # Frontend (Node / Vite)
 frontend/node_modules/
 frontend/dist/
@@ -12,6 +22,7 @@ frontend/*.local
 frontend/.env.*.local
 
 # Engine Build Artifacts (CMake)
+build/
 engine/build/
 engine/build-wasm/
 CMakeCache.txt
@@ -19,22 +30,16 @@ CMakeFiles/
 Makefile
 cmake_install.cmake
 *.dir/
+compile_commands.json
 
-# Generated WASM / JS assets
+# Generated WASM / JS assets (rebuild with `make` in engine/build-wasm)
 frontend/public/engine.js
 frontend/public/engine.wasm
+frontend/public/engine.wasm.debug.wasm
+frontend/public/engine.wasm.map
 
-# Editor directories and files
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-.idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# Scratch test files
+engine/test_wgpu.*
 
+# Agent context (local-only, not for distribution)
 docs/context/

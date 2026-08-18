@@ -27,11 +27,11 @@ void init_renderer(int width, int height) {
     cube->meshType = scene::MeshType::Cube;
     cube->position = math::vec3(0, 0, 0);
     
-    auto sphere = std::make_unique<scene::Node>("Sphere");
-    sphere->meshType = scene::MeshType::Sphere;
-    sphere->position = math::vec3(1.5f, 0.5f, 0);
+    // auto sphere = std::make_unique<scene::Node>("Sphere");
+    // sphere->meshType = scene::MeshType::Sphere;
+    // sphere->position = math::vec3(1.5f, 0.5f, 0);
     
-    cube->addChild(std::move(sphere));
+    // cube->addChild(std::move(sphere));
     root->addChild(std::move(cube));
     
     sceneGraph.root = std::move(root);

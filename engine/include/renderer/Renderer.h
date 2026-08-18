@@ -42,9 +42,9 @@ namespace renderer {
         wgpu::Device device;
         wgpu::Queue queue;
         
-        wgpu::RenderPipeline pipeline;
-        wgpu::RenderPipeline gizmoPipeline;
-        wgpu::RenderPipeline gridPipeline;
+        wgpu::RenderPipeline pipeline;          // General pipeline for meshes
+        wgpu::RenderPipeline gizmoPipeline;     // Pipeline for gizmo
+        wgpu::RenderPipeline gridPipeline;      // Pipeline for grid
         
         wgpu::Surface surface;
         wgpu::TextureFormat swapChainFormat = wgpu::TextureFormat::BGRA8Unorm;

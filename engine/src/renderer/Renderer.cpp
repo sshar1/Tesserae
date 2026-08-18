@@ -15,6 +15,8 @@ namespace renderer {
         return buffer;
     }
 
+    // This loads all meshes in GPU memory. Ideally we only create a buffer when we insert that mesh,
+    // caching future operations
     void Renderer::setup_geometry() {
         geometry::Mesh cube = geometry::PrimitiveGenerator::createCube();
         cubeBuffers.vertexBuffer = createBuffer(cube.vertices.data(), cube.vertices.size() * sizeof(geometry::Vertex), wgpu::BufferUsage::Vertex);
