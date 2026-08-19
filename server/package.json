@@ -1,0 +1,18 @@
+{
+  "name": "tesserae-server",
+  "version": "0.1.0",
+  "description": "Server-authoritative collaboration server for Tesserae 3D editor",
+  "type": "module",
+  "main": "index.ts",
+  "scripts": {
+    "start": "bun run index.ts",
+    "dev": "bun --watch index.ts",
+    "test": "bun test"
+  },
+  "keywords": ["tesserae", "3d", "collaboration", "websocket", "bun"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}

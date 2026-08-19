@@ -295,6 +295,8 @@ namespace renderer {
         // Now handled by resize()
     }
 
+    // This function sucks. It has a separate draw call per element, changing the bound buffer and uniforms for each
+    // very inextendible, especially since we want to support arbitrary meshes later
     void Renderer::render_frame(scene::Scene& sceneGraph, scene::Camera& camera, scene::Node* selectedNode, int gizmoMode) {
         if (!device) return;
 
