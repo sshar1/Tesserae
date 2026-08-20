@@ -6,6 +6,9 @@ import type {
   ServerMessage,
   TransformProperty,
   ConnectionStatus,
+  UpdateTransformPayload,
+  InsertNodePayload,
+  DeleteNodePayload,
 } from './types';
 import {
   createInsertNodeOp,
@@ -15,28 +18,32 @@ import {
 import { OutboundOpQueue } from './op-queue';
 import { Reconciler } from './reconciler';
 import type { WasmEngine } from './reconciler';
+import { HistoryManager } from './history';
 
 export interface CollaborationClientOptions {
-  serverUrl?: string;
   roomId?: string;
   clientId?: string;
+  serverUrl?: string;
   engine?: WasmEngine | null;
   onStatusChange?: (status: ConnectionStatus) => void;
   onHierarchyChange?: () => void;
   onPeersChange?: (peers: PeerPresence[]) => void;
+  onHistoryChange?: () => void;
 }
 
 export class CollaborationClient {
   public readonly roomId: string;
   public readonly clientId: string;
-  public localColor = '#2196F3';
-
   private serverUrl: string;
+
   private ws: WebSocket | null = null;
   private status: ConnectionStatus = 'disconnected';
-  private reconciler: Reconciler;
-  private opQueue: OutboundOpQueue;
+  public localColor = '#2196F3';
   private peers = new Map<string, PeerPresence>();
+
+  public readonly reconciler: Reconciler;
+  public readonly opQueue: OutboundOpQueue;
+  public readonly history: HistoryManager;
 
   private reconnectAttempts = 0;
   private maxReconnectDelay = 10000;
@@ -46,6 +53,7 @@ export class CollaborationClient {
   public onStatusChange?: (status: ConnectionStatus) => void;
   public onHierarchyChange?: () => void;
   public onPeersChange?: (peers: PeerPresence[]) => void;
+  public onHistoryChange?: () => void;
 
   constructor(options: CollaborationClientOptions = {}) {
     this.roomId = options.roomId || 'default';
@@ -55,11 +63,15 @@ export class CollaborationClient {
     this.onStatusChange = options.onStatusChange;
     this.onHierarchyChange = options.onHierarchyChange;
     this.onPeersChange = options.onPeersChange;
+    this.onHistoryChange = options.onHistoryChange;
 
     this.reconciler = new Reconciler(options.engine);
     this.opQueue = new OutboundOpQueue({
       throttleMs: 100,
       onSendBatch: (ops) => this.sendBatchOpsToServer(ops),
+    });
+    this.history = new HistoryManager({
+      onHistoryChange: options.onHistoryChange,
     });
   }
 
@@ -328,6 +340,59 @@ export class CollaborationClient {
 
   public flush(): void {
     this.opQueue.flush();
+  }
+
+  // --- Collaborative Undo / Redo APIs ---
+
+  public recordAction(
+    op: Operation<SequencedOperationType>,
+    inverse: Operation<SequencedOperationType>,
+    description?: string
+  ): void {
+    this.history.record(op, inverse, description);
+  }
+
+  public undo(): boolean {
+    const entry = this.history.undo();
+    if (!entry) return false;
+    this.applyHistoryOp(entry.inverse);
+    return true;
+  }
+
+  public redo(): boolean {
+    const entry = this.history.redo();
+    if (!entry) return false;
+    this.applyHistoryOp(entry.op);
+    return true;
+  }
+
+  private applyHistoryOp(op: Operation<SequencedOperationType>): void {
+    switch (op.type) {
+      case 'UPDATE_TRANSFORM': {
+        const p = op.payload as UpdateTransformPayload;
+        this.updateTransform(p.nodeId, p.property, p.value, p.previousValue);
+        this.flush();
+        break;
+      }
+      case 'INSERT_NODE': {
+        const p = op.payload as InsertNodePayload;
+        this.insertNode(p.parentId, p.node);
+        break;
+      }
+      case 'DELETE_NODE': {
+        const p = op.payload as DeleteNodePayload;
+        this.deleteNode(p.nodeId, p.deletedNode, p.parentId, p.index);
+        break;
+      }
+    }
+  }
+
+  public canUndo(): boolean {
+    return this.history.canUndo();
+  }
+
+  public canRedo(): boolean {
+    return this.history.canRedo();
   }
 }
 

@@ -2,11 +2,23 @@ import { useState, useRef, useEffect } from 'preact/hooks'
 
 interface ToolbarProps {
   gizmoMode: number  // 1=Move, 2=Rotate, 3=Scale
+  canUndo?: boolean
+  canRedo?: boolean
   onModeChange: (mode: number) => void
   onAddPrimitive: (type: string) => void
+  onUndo?: () => void
+  onRedo?: () => void
 }
 
-export function Toolbar({ gizmoMode, onModeChange, onAddPrimitive }: ToolbarProps) {
+export function Toolbar({
+  gizmoMode,
+  canUndo = false,
+  canRedo = false,
+  onModeChange,
+  onAddPrimitive,
+  onUndo,
+  onRedo,
+}: ToolbarProps) {
   const [addMenuOpen, setAddMenuOpen] = useState(false)
   const addContainerRef = useRef<HTMLDivElement>(null)
 
@@ -59,6 +71,33 @@ export function Toolbar({ gizmoMode, onModeChange, onAddPrimitive }: ToolbarProp
           <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
           <line x1="3" y1="12" x2="21" y2="12"></line>
           <line x1="12" y1="3" x2="12" y2="21"></line>
+        </svg>
+      </button>
+      
+      <div className="toolbar-separator" />
+      
+      <button 
+        className="tool-btn-square" 
+        onClick={onUndo} 
+        disabled={!canUndo}
+        style={{ opacity: canUndo ? 1 : 0.4, cursor: canUndo ? 'pointer' : 'default' }}
+        title="Undo (Ctrl+Z / Cmd+Z)"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 7v6h6"></path>
+          <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path>
+        </svg>
+      </button>
+      <button 
+        className="tool-btn-square" 
+        onClick={onRedo} 
+        disabled={!canRedo}
+        style={{ opacity: canRedo ? 1 : 0.4, cursor: canRedo ? 'pointer' : 'default' }}
+        title="Redo (Ctrl+Shift+Z / Cmd+Shift+Z)"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 7v6h-6"></path>
+          <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"></path>
         </svg>
       </button>
       
