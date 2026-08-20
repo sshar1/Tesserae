@@ -21,17 +21,17 @@ void set_gizmo_mode(int mode) {
 }
 
 void init_renderer(int width, int height) {
+    scene::Node::nextId_ = 1;
     auto root = std::make_unique<scene::Node>("Root");
+    root->id = 1;
+    scene::Node::nextId_ = 2;
     
     auto cube = std::make_unique<scene::Node>("Cube");
+    cube->id = 2;
     cube->meshType = scene::MeshType::Cube;
-    cube->position = math::vec3(0, 0, 0);
+    cube->position = math::vec3(0, 0.5f, 0);
+    scene::Node::nextId_ = 3;
     
-    // auto sphere = std::make_unique<scene::Node>("Sphere");
-    // sphere->meshType = scene::MeshType::Sphere;
-    // sphere->position = math::vec3(1.5f, 0.5f, 0);
-    
-    // cube->addChild(std::move(sphere));
     root->addChild(std::move(cube));
     
     sceneGraph.root = std::move(root);
@@ -186,9 +186,13 @@ bool insert_node(int id, std::string name, std::string type, int parentId,
         scene::Node::nextId_ = id + 1;
     }
     scene::Node* parent = sceneGraph.findNodeById(parentId);
-    if (!parent) parent = sceneGraph.root.get();
+    if (!parent || parentId <= 1) parent = sceneGraph.root.get();
     
-    scene::Node* existing = sceneGraph.findNodeById(id);
+    // Never treat root as an existing regular child node to mutate
+    scene::Node* existing = (id == 1 || (sceneGraph.root && id == sceneGraph.root->id)) 
+        ? nullptr 
+        : sceneGraph.findNodeById(id);
+
     if (existing) {
         existing->name = name;
         if (type == "Cube") existing->meshType = scene::MeshType::Cube;
@@ -199,11 +203,10 @@ bool insert_node(int id, std::string name, std::string type, int parentId,
         existing->position = math::vec3(px, py, pz);
         existing->rotation = math::quat::fromEulerDegrees(rx, ry, rz);
         existing->scale = math::vec3(sx, sy, sz);
-        sceneGraph.update(); // Optimization: we only need to update the subtree of the new node, not the entire tree
+        sceneGraph.update();
         return true;
     }
 
-    // TODO remove code duplication with above block
     auto node = std::make_unique<scene::Node>(name);
     node->id = id;
     if (type == "Cube") node->meshType = scene::MeshType::Cube;
@@ -217,7 +220,7 @@ bool insert_node(int id, std::string name, std::string type, int parentId,
     node->scale = math::vec3(sx, sy, sz);
     
     parent->addChild(std::move(node));
-    sceneGraph.update(); // Same optimization as above
+    sceneGraph.update();
     return true;
 }
 
@@ -225,8 +228,13 @@ void clear_scene() {
     if (selectedNode) {
         selectedNode = nullptr;
     }
-    sceneGraph.root->children.clear();
-    sceneGraph.update();
+    if (sceneGraph.root) {
+        sceneGraph.root->id = 1;
+        sceneGraph.root->name = "Root";
+        sceneGraph.root->meshType = scene::MeshType::None;
+        sceneGraph.root->children.clear();
+        sceneGraph.update();
+    }
 }
 
 EMSCRIPTEN_BINDINGS(my_module) {
