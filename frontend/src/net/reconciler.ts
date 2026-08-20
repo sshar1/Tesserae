@@ -78,7 +78,25 @@ export class Reconciler {
   ): void {
     if (!this.engine) return;
 
-    // If inverse was not provided, compute it from current WASM engine state
+    if (op.type === 'UPDATE_TRANSFORM') {
+      const payload = op.payload as UpdateTransformPayload;
+      const existing = this.unconfirmedOps.find(
+        (u) =>
+          u.op.type === 'UPDATE_TRANSFORM' &&
+          (u.op.payload as UpdateTransformPayload).nodeId === payload.nodeId &&
+          (u.op.payload as UpdateTransformPayload).property === payload.property
+      );
+
+      if (existing) {
+        // Coalesce in place: update target value while preserving original starting inverse
+        const existingPayload = existing.op.payload as UpdateTransformPayload;
+        existingPayload.value = [payload.value[0], payload.value[1], payload.value[2]];
+        this.applyToEngine(op);
+        return;
+      }
+    }
+
+    // If inverse was not provided, compute it from current WASM engine state BEFORE applying
     const computedInverse = inverse || this.computeInverse(op);
 
     // Apply to local engine immediately (0ms local latency)

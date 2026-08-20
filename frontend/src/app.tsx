@@ -175,7 +175,7 @@ export function App() {
 
         if (selectedAxis !== -1) {
           moduleInstance.drag_selected(dx, dy, selectedAxis)
-          const curId = selectedIdRef.current
+          const curId = moduleInstance.get_selected_node_id()
           if (curId >= 0) {
             try {
               const rawT = moduleInstance.get_node_transform(curId)
