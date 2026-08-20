@@ -178,6 +178,57 @@ int get_gizmo_mode() {
     return current_gizmo_mode;
 }
 
+bool insert_node(int id, std::string name, std::string type, int parentId,
+                 float px, float py, float pz,
+                 float rx, float ry, float rz,
+                 float sx, float sy, float sz) {
+    if (scene::Node::nextId_ <= id) {
+        scene::Node::nextId_ = id + 1;
+    }
+    scene::Node* parent = sceneGraph.findNodeById(parentId);
+    if (!parent) parent = sceneGraph.root.get();
+    
+    scene::Node* existing = sceneGraph.findNodeById(id);
+    if (existing) {
+        existing->name = name;
+        if (type == "Cube") existing->meshType = scene::MeshType::Cube;
+        else if (type == "Sphere") existing->meshType = scene::MeshType::Sphere;
+        else if (type == "Plane") existing->meshType = scene::MeshType::Plane;
+        else if (type == "Torus") existing->meshType = scene::MeshType::Torus;
+        else existing->meshType = scene::MeshType::None;
+        existing->position = math::vec3(px, py, pz);
+        existing->rotation = math::quat::fromEulerDegrees(rx, ry, rz);
+        existing->scale = math::vec3(sx, sy, sz);
+        sceneGraph.update(); // Optimization: we only need to update the subtree of the new node, not the entire tree
+        return true;
+    }
+
+    // TODO remove code duplication with above block
+    auto node = std::make_unique<scene::Node>(name);
+    node->id = id;
+    if (type == "Cube") node->meshType = scene::MeshType::Cube;
+    else if (type == "Sphere") node->meshType = scene::MeshType::Sphere;
+    else if (type == "Plane") node->meshType = scene::MeshType::Plane;
+    else if (type == "Torus") node->meshType = scene::MeshType::Torus;
+    else node->meshType = scene::MeshType::None;
+    
+    node->position = math::vec3(px, py, pz);
+    node->rotation = math::quat::fromEulerDegrees(rx, ry, rz);
+    node->scale = math::vec3(sx, sy, sz);
+    
+    parent->addChild(std::move(node));
+    sceneGraph.update(); // Same optimization as above
+    return true;
+}
+
+void clear_scene() {
+    if (selectedNode) {
+        selectedNode = nullptr;
+    }
+    sceneGraph.root->children.clear();
+    sceneGraph.update();
+}
+
 EMSCRIPTEN_BINDINGS(my_module) {
     emscripten::function("add", &add);
     emscripten::function("init_renderer", &init_renderer);
@@ -201,4 +252,6 @@ EMSCRIPTEN_BINDINGS(my_module) {
     emscripten::function("add_primitive_node", &add_primitive_node);
     emscripten::function("delete_node_by_id", &delete_node_by_id);
     emscripten::function("get_gizmo_mode", &get_gizmo_mode);
+    emscripten::function("insert_node", &insert_node);
+    emscripten::function("clear_scene", &clear_scene);
 }

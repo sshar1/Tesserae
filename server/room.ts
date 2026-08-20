@@ -197,6 +197,13 @@ export class Room {
         this.processOperation(ws, clientId, op);
         break;
       }
+      case 'BATCH_OPS': {
+        const ops = msg.ops;
+        if (Array.isArray(ops)) {
+          this.processBatchOperations(ws, clientId, ops);
+        }
+        break;
+      }
       case 'INSERT_NODE':
       case 'DELETE_NODE':
       case 'UPDATE_TRANSFORM': {
@@ -220,6 +227,10 @@ export class Room {
 
   /**
    * Validates, applies, sequences, and broadcasts an operation.
+   * 
+   * TODO: Add client-side and server-side rate-limiting (e.g. token bucket per client)
+   * and a maximum room node limit (e.g. MAX_ROOM_NODES = 5000) to prevent denial-of-service
+   * or memory exhaustion from rapid INSERT_NODE/structural operation spam.
    */
   private processOperation(
     ws: ServerWebSocket<ClientData>,
@@ -269,6 +280,53 @@ export class Room {
     };
 
     this.broadcast(broadcastMsg);
+  }
+
+  /**
+   * Processes a batch of operations atomically in a single pass.
+   */
+  private processBatchOperations(
+    ws: ServerWebSocket<ClientData>,
+    clientId: string,
+    ops: any[]
+  ): void {
+    const confirmedOps: Array<{
+      seqNum: number;
+      opType: SequencedOperationType;
+      payload: any;
+    }> = [];
+
+    for (const op of ops) {
+      if (!op || typeof op !== 'object') continue;
+      const validation = validateOperation(op);
+      if (!validation.valid) continue;
+
+      const result = applyOperation(this.scene, op);
+      if (!result.success) continue;
+
+      this.currentSeqNum++;
+      confirmedOps.push({
+        seqNum: this.currentSeqNum,
+        opType: op.type,
+        payload: op.payload,
+      });
+    }
+
+    if (confirmedOps.length === 1) {
+      this.broadcast({
+        type: 'OP',
+        seqNum: confirmedOps[0].seqNum,
+        clientId,
+        opType: confirmedOps[0].opType,
+        payload: confirmedOps[0].payload,
+      });
+    } else if (confirmedOps.length > 1) {
+      this.broadcast({
+        type: 'BATCH_OPS',
+        clientId,
+        ops: confirmedOps,
+      });
+    }
   }
 
   /**

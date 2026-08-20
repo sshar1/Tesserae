@@ -349,3 +349,78 @@
 .transform-input[type=number] {
   -moz-appearance: textfield;
 }
+
+/* Collaboration Status & Peer Presence */
+.collab-status-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--panel-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  z-index: 10;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transition: background-color 200ms ease;
+}
+
+.status-dot.connected {
+  background-color: #4CAF50;
+  box-shadow: 0 0 6px rgba(76, 175, 80, 0.6);
+}
+
+.status-dot.connecting,
+.status-dot.reconnecting {
+  background-color: #FF9800;
+  box-shadow: 0 0 6px rgba(255, 152, 0, 0.6);
+  animation: pulse 1.5s infinite;
+}
+
+.status-dot.disconnected,
+.status-dot.error {
+  background-color: #F44336;
+  box-shadow: 0 0 6px rgba(244, 67, 54, 0.6);
+}
+
+@keyframes pulse {
+  0% { opacity: 0.4; }
+  50% { opacity: 1; }
+  100% { opacity: 0.4; }
+}
+
+.peer-avatars {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 4px;
+}
+
+.peer-avatar {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  display: inline-block;
+}
+
+.peer-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-left: auto;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+

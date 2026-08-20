@@ -1,14 +1,16 @@
 import { useState } from 'preact/hooks'
 import type { SceneNode } from '../app'
+import type { PeerPresence } from '../net/types'
 
 interface OutlinerProps {
   nodes: SceneNode[]
   selectedId: number
+  peers?: PeerPresence[]
   onSelect: (id: number) => void
   onDelete: (id: number) => void
 }
 
-export function Outliner({ nodes, selectedId, onSelect, onDelete }: OutlinerProps) {
+export function Outliner({ nodes, selectedId, peers = [], onSelect, onDelete }: OutlinerProps) {
   const [collapsedIds, setCollapsedIds] = useState<Set<number>>(new Set());
 
   const toggleCollapse = (id: number, e: Event) => {
@@ -56,6 +58,14 @@ export function Outliner({ nodes, selectedId, onSelect, onDelete }: OutlinerProp
                 {isCollapsed ? '▸' : '▾'}
               </div>
               <div className="node-name">{node.name}</div>
+              {peers.filter(p => p.selectedNodeId === node.id).map(p => (
+                <div
+                  key={p.clientId}
+                  className="peer-dot"
+                  style={{ backgroundColor: p.color }}
+                  title={`Selected by peer (${p.clientId.slice(0, 6)})`}
+                />
+              ))}
               <button 
                 className="node-delete" 
                 onClick={(e) => { e.stopPropagation(); onDelete(node.id); }}

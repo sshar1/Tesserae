@@ -185,4 +185,57 @@ describe('Room Collaboration & Sequencing', () => {
     expect(c2LastMsg.type).toBe('PEER_LEFT');
     expect(c2LastMsg.clientId).toBe('client-1');
   });
+
+  test('processes and broadcasts BATCH_OPS atomically', () => {
+    const room = new Room('test-room');
+
+    const client1 = new MockWebSocket({
+      roomId: 'test-room',
+      clientId: 'client-1',
+      color: room.assignPeerColor(),
+      selectedNodeId: -1,
+      gizmoMode: 1,
+      joinedAt: Date.now(),
+    });
+
+    const client2 = new MockWebSocket({
+      roomId: 'test-room',
+      clientId: 'client-2',
+      color: room.assignPeerColor(),
+      selectedNodeId: -1,
+      gizmoMode: 1,
+      joinedAt: Date.now(),
+    });
+
+    room.addClient(client1 as any);
+    room.addClient(client2 as any);
+
+    // Client 1 sends a batch of 2 operations
+    room.handleMessage(
+      client1 as any,
+      JSON.stringify({
+        type: 'BATCH_OPS',
+        ops: [
+          {
+            type: 'UPDATE_TRANSFORM',
+            payload: { nodeId: 2, property: 'position', value: [1, 2, 3] },
+          },
+          {
+            type: 'UPDATE_TRANSFORM',
+            payload: { nodeId: 2, property: 'rotation', value: [0, 90, 0] },
+          },
+        ],
+      })
+    );
+
+    expect(room.getSeqNum()).toBe(2);
+
+    const c2LastMsg = JSON.parse(client2.messages[client2.messages.length - 1]);
+    expect(c2LastMsg.type).toBe('BATCH_OPS');
+    expect(c2LastMsg.clientId).toBe('client-1');
+    expect(c2LastMsg.ops.length).toBe(2);
+    expect(c2LastMsg.ops[0].seqNum).toBe(1);
+    expect(c2LastMsg.ops[1].seqNum).toBe(2);
+  });
 });
+
